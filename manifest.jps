@@ -51,5 +51,3 @@ success: |
   **Username**: ${globals.admin_name}
   
   **Password**: ${globals.admin_pass}
-  
-  **URL**: (${env.url})[${env.url}]
