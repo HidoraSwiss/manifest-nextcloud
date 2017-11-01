@@ -1,0 +1,55 @@
+type: install
+version: 1.4
+name: Nextcloud
+displayName: Nextcloud
+homepage: https://github.com/HidoraSwiss/manifest-nextcloud
+logo: https://raw.githubusercontent.com/HidoraSwiss/manifest-nextcloud/master/images/nextcloud-round.png
+description: |
+  Nextcloud puts your data at your fingertips, under your control. Store your documents, calendar, contacts and photos on your Jelastic plateform.
+  
+  More info on [https://nextcloud.com/](https://nextcloud.com/)
+
+globals:
+  db_user: nextcloud
+  db_pass: ${fn.password(15)}
+  db_name: nextcloud
+  admin_name: admin
+  admin_pass: ${fn.password(10)}
+
+nodes:
+  - image: nextcloud
+    count: 1
+    cloudlets: 16
+    nodeGroup: cp
+    env:
+     MYSQL_PASSWORD: ${globals.db_pass}
+     MYSQL_DATABASE: ${globals.db_name}
+     MYSQL_USER: ${globals.db_user}
+     MYSQL_HOST: DB
+     NEXTCLOUD_ADMIN_USER: ${globals.admin_name}
+     NEXTCLOUD_ADMIN_PASSWORD: ${globals.admin_pass}
+    links:
+     - sqldb:DB
+    volumes:
+     - /var/www/html/data
+     - /var/www/html
+      
+  - image: mariadb
+    count: 1
+    cloudlets: 16
+    nodeGroup: sqldb
+    env:
+     MYSQL_PASSWORD: ${globals.db_pass}
+     MYSQL_DATABASE: ${globals.db_name}
+     MYSQL_USER: ${globals.db_user}
+     MYSQL_RANDOM_ROOT_PASSWORD: true
+    volumes:
+     - /var/www/html/data
+
+success: |
+  ## Nextcloud is ready
+  **Username**: ${globals.admin_name}
+  
+  **Password**: ${globals.admin_pass}
+  
+  **URL**: (${env.url})[${env.url}]
