@@ -1,6 +1,8 @@
 type: install
 version: 1.4
 name: Nextcloud
+categories: ["apps/file-management", "apps/popular", "apps/file-manager"]
+appVersion: 12
 displayName: Nextcloud
 homepage: https://github.com/HidoraSwiss/manifest-nextcloud
 logo: https://raw.githubusercontent.com/HidoraSwiss/manifest-nextcloud/master/images/nextcloud-round.png
