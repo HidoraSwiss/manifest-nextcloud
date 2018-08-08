@@ -19,7 +19,7 @@ globals:
   admin_pass: ${fn.password(10)}
 
 nodes:
-  - image: nextcloud
+  - image: nextcloud:stable-fpm
     count: 1
     cloudlets: 16
     nodeGroup: cp
