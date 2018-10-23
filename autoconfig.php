@@ -1,12 +1,12 @@
 <?php
 $AUTOCONFIG = array(
   "dbtype"        => "mysql",
-  "dbname"        => "nextcloud",
-  "dbuser"        => "username",
-  "dbpass"        => "password",
-  "dbhost"        => "localhost",
+  "dbname"        => "{DB_NAME}",
+  "dbuser"        => "{DB_USER}",
+  "dbpass"        => "{DB_PASSWORD}",
+  "dbhost"        => "{DB_HOST}",
   "dbtableprefix" => "",
-  "adminlogin"    => "root",
-  "adminpass"     => "root-password",
-  "directory"     => "/www/htdocs/nextcloud/data",
+  "adminlogin"    => "{ADMIN_NAME}",
+  "adminpass"     => "{ADMIN_PASSWORD}",
+  "directory"     => "/var/www/html/data",
 );
