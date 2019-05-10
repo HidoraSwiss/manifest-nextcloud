@@ -1,6 +1,6 @@
 <?php
 $AUTOCONFIG = array(
-  "dbtype"        => "mysql",
+  "dbtype"        => "pgsql",
   "dbname"        => "DB_NAME",
   "dbuser"        => "DB_USER",
   "dbpass"        => "DB_PASSWORD",
