@@ -13,56 +13,43 @@ description: |
 
 globals:
   DB_PASSWORD: ${fn.password(10)}
-
-nodes:         
-  - image: nextcloud
+  
+nodes: 
+  - image: nextcloud 
+    count: 1 
+    cloudlets: 16 
+    nodeGroup: cp 
+    volumes: 
+     - /var/www/html/data 
+     - /var/www/html 
+    skipNodeEmails: true   
+        
+  - nodeType: postgresql
+    nodeGroup: sqldb
     count: 1
     cloudlets: 16
-    nodeGroup: cp
-    env:
-     MYSQL_DATABASE: nextcloud
-     MYSQL_USER: nextcloud-admin
-     MYSQL_HOST: ${nodes.mysql5.address}
-     MYSQL_PASSWORD: ${globals.DB_PASSWORD} 
-    volumes:
-     - /var/www/html/data
-     - /var/www/html
-     
-  - nodeType: mysql5
-    count: 1
-    cloudlets: 16
-    env:
-      MYSQL_PASSWORD: ${globals.DB_PASSWORD}
-    volumes:
-     - /var/www/html/data
-
+    skipNodeEmails: true 
+          
 onInstall:
-  prepareSqlDatabase:
-    - nodeType: mysql5
-      loginCredentials:
-       user: root
-       password: ${nodes.mysql5.password}
-      newDatabaseName: nextcloud
-      newDatabaseUser:
-       name: nextcloud
-       password: ${globals.DB_PASSWORD} 
-
-  cmd[cp]:
-    - cd /var/www/html/config && rm -rf autoconfig.php && wget https://raw.githubusercontent.com/HidoraSwiss/manifest-nextcloud/master/autoconfig.php
-    - sed -i 's/DB_HOST/${nodes.mysql5.address}/g' /var/www/html/config/autoconfig.php
-    - sed -i 's/DB_USER/nextcloud/g' /var/www/html/config/autoconfig.php
-    - sed -i 's/ADMIN_NAME/admin/g' /var/www/html/config/autoconfig.php
-    - sed -i 's/DB_NAME/nextcloud/g' /var/www/html/config/autoconfig.php
-    - sed -i 's/DB_PASSWORD/${globals.DB_PASSWORD}/g'  /var/www/html/config/autoconfig.php
-    - sed -i 's/ADMIN_PASSWORD/${user.appPassword}/g' /var/www/html/config/autoconfig.php
+  - log: configuration Password PG
+  - cmd[sqldb]:
+     - jem passwd set -p "${globals.PG_PASSWORD}"			# configure password of PG
+    user: root
     
-restartContainers:
-  - nodeGroup: cp
+  - cmd[cp]: 
+    - wget https://raw.githubusercontent.com/HidoraSwiss/manifest-nextcloud/master/autoconfig.php 
+    - sleep 10 
+    - sed -i 's/DB_PASSWORD/${globals.PG_PASSWORD}/g' autoconfig.php
+    - sed -i 's/DB_HOST/${nodes.sqldb.address}/g' autoconfig.php
+    - sed -i 's/DB_USER/webadmin/g' autoconfig.php
+    - sed -i 's/ADMIN_NAME/admin/g' autoconfig.php
+    - sed -i 's/DB_NAME/nextclouddb/g' autoconfig.php
+    - sed -i 's/ADMIN_PASSWORD/${user.appPassword}/g' autoconfig.php
+    - cp autoconfig.php /var/www/html/config/autoconfig.php
+
 
 success: |
   ## Nextcloud is ready
   **Username**: admin
   
   **Password**: ${user.appPassword}
-
-  
