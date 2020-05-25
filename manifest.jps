@@ -33,23 +33,21 @@ nodes:
 onInstall:
   - log: configuration Password PG
   - cmd[sqldb]:
-     - jem passwd set -p "${globals.PG_PASSWORD}"			# configure password of PG
+     - jem passwd set -p "${globals.DB_PASSWORD}"
     user: root
     
-  - cmd[cp]: 
-    - wget https://raw.githubusercontent.com/HidoraSwiss/manifest-nextcloud/master/autoconfig.php 
-    - sleep 10 
-    - sed -i 's/DB_PASSWORD/${globals.PG_PASSWORD}/g' autoconfig.php
-    - sed -i 's/DB_HOST/${nodes.sqldb.address}/g' autoconfig.php
-    - sed -i 's/DB_USER/webadmin/g' autoconfig.php
-    - sed -i 's/ADMIN_NAME/admin/g' autoconfig.php
-    - sed -i 's/DB_NAME/nextclouddb/g' autoconfig.php
-    - sed -i 's/ADMIN_PASSWORD/${user.appPassword}/g' autoconfig.php
-    - cp autoconfig.php /var/www/html/config/autoconfig.php
-
+  - log: configuration Nextcloud
+  - cmd[cp]:
+     - wget https://raw.githubusercontent.com/HidoraSwiss/manifest-nextcloud/master/autoconfig.php
+     - sed -i 's/DB_PASSWORD/${globals.DB_PASSWORD}/g' autoconfig.php
+     - sed -i 's/DB_USER/webadmin/g' autoconfig.php
+     - sed -i 's/ADMIN_NAME/admin/g' autoconfig.php
+     - sed -i 's/DB_NAME/nextclouddb/g' autoconfig.php
+     - sed -i 's/ADMIN_PASSWORD/${user.appPassword}/g' autoconfig.php
+     - cp autoconfig.php /var/www/html/config/autoconfig.php     
 
 success: |
-  ## Nextcloud is ready
+  ## [Nextcloud](${env.url}) is ready
   **Username**: admin
   
   **Password**: ${user.appPassword}
