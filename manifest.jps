@@ -23,31 +23,31 @@ nodes:
      - /var/www/html/data 
      - /var/www/html 
     skipNodeEmails: true   
+    env:
+        MYSQL_PASSWORD: ${globals.DB_PASSWORD}
+        MYSQL_DATABASE: nextclouddb
+        MYSQL_USER: root
+        MYSQL_HOST: sqldb
         
-  - nodeType: postgresql
+  - nodeType: mysql
     nodeGroup: sqldb
     count: 1
     cloudlets: 16
     skipNodeEmails: true 
           
 onInstall:
-  - log: configuration Password PG
+  - log: configuration Password MySQL
   - cmd[sqldb]:
      - jem passwd set -p "${globals.DB_PASSWORD}"
     user: root
     
-  - log: configuration Nextcloud
-  - cmd[cp]:
-     - wget https://raw.githubusercontent.com/HidoraSwiss/manifest-nextcloud/master/autoconfig.php
-     - sed -i 's/DB_PASSWORD/${globals.DB_PASSWORD}/g' autoconfig.php
-     - sed -i 's/DB_USER/webadmin/g' autoconfig.php
-     - sed -i 's/ADMIN_NAME/admin/g' autoconfig.php
-     - sed -i 's/DB_NAME/nextclouddb/g' autoconfig.php
-     - sed -i 's/ADMIN_PASSWORD/${user.appPassword}/g' autoconfig.php
-     - cp autoconfig.php /var/www/html/config/autoconfig.php     
 
 success: |
   ## [Nextcloud](${env.url}) is ready
   **Username**: admin
   
   **Password**: ${user.appPassword}
+  
+  
+  
+  **It can take few minutes before to be able to open Nexctloud for the first time**
