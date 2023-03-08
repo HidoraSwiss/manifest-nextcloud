@@ -10,11 +10,17 @@ description: |
   Nextcloud puts your data at your fingertips, under your control. Store your documents, calendar, contacts and photos on your Jelastic plateform.
   
   More info on [https://nextcloud.com/](https://nextcloud.com/)
+ssl: true
 
 globals:
   DB_PASSWORD: ${fn.password(10)}
   
 nodes: 
+  - nodeType: nginx
+    nodeGroup: bl
+    count: 1
+    skipNodeEmails: true 
+
   - image: nextcloud 
     count: 1 
     cloudlets: 16 
@@ -36,12 +42,24 @@ nodes:
     skipNodeEmails: true 
           
 onInstall:
-  - log: configuration Password MySQL
-  - cmd[sqldb]:
-     - jem passwd set -p "${globals.DB_PASSWORD}"
-    user: root
-    
+  - reset-db-password
+  - config-backup-db
 
+
+actions:
+  reset-db-password : 
+    - log: configuration Password MariaDB
+    - cmd[sqldb]:
+       - jem passwd set -p "${globals.DB_PASSWORD}"
+      user: root
+
+  config-backup-db : 
+    - log: configuration Backup database
+    - cmd[sqldb]:
+       - echo "0 2 * * * /var/lib/jelastic/bin/backup_script.sh -m dumpall -c 7 -u root -p ${globals.DB_PASSWORD}" >> /var/spool/cron/mysql
+      
+
+   
 success: |
   ## [Nextcloud](${env.url}) is ready
   **Username**: admin
